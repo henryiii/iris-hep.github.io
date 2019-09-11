@@ -10,9 +10,13 @@ module Indico
       # Do nothing if already downloaded
       return if site.data.key? 'topical'
 
-      puts 'Accessing Indico meeting API - run bundle exec _scripts/get_indico.rb to cache'
-      iris_meeting = Meetings.new(10570)
-      site.data['topical'] = iris_meeting.dict
+      begin
+        puts 'Accessing Indico meeting API - run bundle exec _scripts/get_indico.rb to cache'
+        iris_meeting = Meetings.new(10570)
+        site.data['topical'] = iris_meeting.dict
+      rescue SocketError
+        puts 'Failed to access the indico meeting API'
+      end
     end
   end
 end

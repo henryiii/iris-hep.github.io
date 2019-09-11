@@ -28,13 +28,18 @@ module Publications
       @site.data['publications'].each do |name, pub|
         prepare(pub, name)
 
-        # Add caching to reduce requests to INSPIRE
-        caching(pub, name) { |p| inspire(p) }
+        begin
+          # Add caching to reduce requests to INSPIRE
+          caching(pub, name) { |p| inspire(p) }
 
-        # Submitted-to field and check
-        submitted_to(pub, name)
+          # Submitted-to field and check
+          submitted_to(pub, name)
 
-        # Highlighted publications?
+          # Highlighted publications?
+
+        rescue SocketError
+          puts "Unable to contact Inspire"
+        end
       end
     end
 
@@ -175,6 +180,7 @@ module Publications
         puts "Reading #{cname} from cache"
       else
         puts "Saving #{cname}"
+        
         yield pub
         save_to_cache(pub, cname)
       end
